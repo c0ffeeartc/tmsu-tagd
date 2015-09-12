@@ -89,8 +89,8 @@ retval=$?
 choice=`cat $tempfile`
 case $retval in
   0)
-    UNTAG_ALL="tmsu untag $FILE --all"
-    RETAG="tmsu tag $FILE --tags \"${choice}\""
+    UNTAG_ALL="tmsu untag --all $FILE"
+    RETAG="tmsu tag --tags \"${choice}\" $FILE||tmsu tag --tags \"$FILE_TAGS\" $FILE"
     echo "$UNTAG_ALL ; $RETAG"
 
     if [ "$FILE_TAGS" ]; then eval $UNTAG_ALL; fi
