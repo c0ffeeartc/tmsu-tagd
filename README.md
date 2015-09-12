@@ -4,7 +4,7 @@ ncurses dialog shell script for editing tmsu tags of one file
 #### Usage
 `$ tmsu-tagd ./file` will open ncurses ui checklist with available tags.
 
-Hit `<Escape>` or press `Cancel` to abort changes. Hit `OK` to untag --all, and then retag with chosen tags.
+Hit `<Escape>` or press `Cancel` to abort changes. Press `OK` to untag --all, and then retag with chosen tags.
 
 #### Dependencies
   - [tmsu](https://github.com/oniony/TMSU)
