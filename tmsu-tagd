@@ -1,0 +1,96 @@
+#!/bin/sh
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+#
+# require argument
+#
+[ "$#" -eq 1 ] || die "1 filename argument required, $# provided"
+
+
+#
+# resolved symbolic link
+#
+FILE=$(readlink -f $1)
+[ -f "$FILE" ] || die "No such file $FILE"
+
+
+#
+# tempfile magic
+#
+DIALOG=${DIALOG=dialog}
+tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+trap "rm -f $tempfile" 0 1 2 5 15
+
+
+#
+# read tags and values
+#
+FILE_TAGS=$(tmsu tags $FILE|cut -d \  -sf 2-)
+ALL_TAGS=$(tmsu tags)
+ALL_VALUES=$(tmsu values)
+
+
+#
+# prepare checklist
+#   WARNING: relies on that FILE_TAGS and ALL_TAGS are in same order
+#
+CHECKS=""
+F_TAG_I=1
+for TAG in $ALL_TAGS; do
+
+    enabled=false
+    F_TAG=$(echo $FILE_TAGS|cut -d \  -f $F_TAG_I)
+    TAG_NAME=$(echo $F_TAG|cut -d "=" -f 1)
+    TAG_VAL=$(echo $F_TAG|cut -d "=" -sf 2)
+    if [ "${TAG_NAME}" == "${TAG}" ];then
+        if [ "$TAG_VAL" ]; then
+            CHECKS+="$F_TAG \"\" on "
+        else
+            enabled=true
+        fi
+        ((F_TAG_I+=1))
+    fi
+
+    CHECKS+="$TAG "
+    if $enabled ; then
+        CHECKS+='"" on '
+    else
+        CHECKS+='"" off '
+    fi
+done
+echo $CHECKS
+
+
+#
+# show dialog
+#
+$DIALOG --backtitle "Edit tags" \
+	    --title     "Edit tags" \
+        --clear \
+        --checklist "$FILE" 70 100 32 \
+        $CHECKS 2> $tempfile
+
+retval=$?
+
+
+#
+# handle result
+#
+choice=`cat $tempfile`
+case $retval in
+  0)
+    UNTAG_ALL="tmsu untag $FILE --all"
+    RETAG="tmsu tag $FILE --tags \"${choice}\""
+    echo "$UNTAG_ALL ; $RETAG"
+
+    if [ "$FILE_TAGS" ]; then eval $UNTAG_ALL; fi
+    if [ "$choice" ]; then eval $RETAG; fi
+    ;;
+  1)
+    echo "Cancel pressed.";;
+  255)
+    echo "ESC pressed.";;
+esac
