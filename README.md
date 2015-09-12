@@ -12,4 +12,4 @@ Hit `<Escape>` or press `Cancel` to abort changes. Press `OK` to untag --all, an
   - ncurses
 
 #### Known Issues
-  - Adding new values isn't yet supported
+  - Adding new tags/values isn't yet supported
