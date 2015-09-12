@@ -2,12 +2,12 @@
 ncurses dialog shell script for editing tmsu tags of one file
 
 #### Usage
-Running `tmsu-tagd ./file` from shell will open ncurses ui checklist with available tags.
+`$ tmsu-tagd ./file` will open ncurses ui checklist with available tags.
 
 Hit `<Escape>` or press `Cancel` to abort changes. Hit `OK` to untag --all, and then retag with chosen tags.
 
 #### Dependencies
-  - tmsu
+  - [tmsu](https://github.com/oniony/TMSU)
   - dialog
   - ncurses
 
