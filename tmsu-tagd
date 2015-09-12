@@ -42,17 +42,24 @@ F_TAG_I=1
 for TAG in $ALL_TAGS; do
 
     enabled=false
-    F_TAG=$(echo $FILE_TAGS|cut -d \  -f $F_TAG_I)
-    TAG_NAME=$(echo $F_TAG|cut -d "=" -f 1)
-    TAG_VAL=$(echo $F_TAG|cut -d "=" -sf 2)
-    if [ "${TAG_NAME}" == "${TAG}" ];then
-        if [ "$TAG_VAL" ]; then
-            CHECKS+="$F_TAG \"\" on "
+    resolving_tag_values=true
+    while $resolving_tag_values; do
+        F_TAG=$(echo $FILE_TAGS|cut -d \  -f $F_TAG_I)
+        TAG_NAME=$(echo $F_TAG|cut -d "=" -f 1)
+        TAG_VAL=$(echo $F_TAG|cut -d "=" -sf 2)
+        if [ "${TAG_NAME}" == "${TAG}" ];then
+            if [ "$TAG_VAL" ]; then
+                CHECKS+="$F_TAG \"\" on "
+            else
+                enabled=true
+                resolving_tag_values=false
+            fi
+            ((F_TAG_I+=1))
         else
-            enabled=true
+            resolving_tag_values=false
         fi
-        ((F_TAG_I+=1))
-    fi
+
+    done
 
     CHECKS+="$TAG "
     if $enabled ; then
