@@ -45,6 +45,12 @@ for TAG in $ALL_TAGS; do
     resolving_tag_values=true
     while $resolving_tag_values; do
         F_TAG=$(echo $FILE_TAGS|cut -d \  -f $F_TAG_I)
+
+        MORE_THAN_1_TAG=$(echo $FILE_TAGS|cut -d \  -sf 1)
+        if [ ! "$MORE_THAN_1_TAG" ] && [ "$F_TAG_I" -gt 1 ];then
+            break
+        fi
+
         TAG_NAME=$(echo $F_TAG|cut -d "=" -f 1)
         TAG_VAL=$(echo $F_TAG|cut -d "=" -sf 2)
         if [ "${TAG_NAME}" == "${TAG}" ];then
