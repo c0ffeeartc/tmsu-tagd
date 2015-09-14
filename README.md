@@ -9,7 +9,7 @@ To add new tags and values use:
 $ tmsu-tagd ./file new_tag newtag2=value
 ```
 
-Hit `<Escape>` or press `Cancel` to abort changes. Press `OK` to untag --all, and then retag with chosen tags.
+Hit `<Escape>` or press `Cancel` to abort changes. Press `OK` to apply chosen tags.
 Hit letter keys to place cursor at tag with matching first letter.
 
 You may want to create easier symbolic link `ln -s ./tmsu-tagd tagd`
