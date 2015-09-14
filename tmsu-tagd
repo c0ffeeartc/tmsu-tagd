@@ -19,14 +19,6 @@ FILE=$(readlink -f $1)
 
 
 #
-# tempfile magic
-#
-DIALOG=${DIALOG=dialog}
-tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
-trap "rm -f $tempfile" 0 1 2 5 15
-
-
-#
 # read tags and values
 #
 FILE_TAGS=$(tmsu tags $FILE|cut -d \  -sf 2-)
@@ -58,14 +50,15 @@ fi
 #
 CHECKS=""
 F_TAG_I=2
+NEXT=$(echo $COLLECT_TAGS |cut -d \  -sf $F_TAG_I)
 while [ "$F_TAG_I" -le "$COLLECT_AMT" ]; do
     enabled=false
-    CUR=$(echo $COLLECT_TAGS |cut -d \  -sf $F_TAG_I)
+    CUR=$NEXT
     NEXT=$(echo $COLLECT_TAGS |cut -d \  -sf $((($F_TAG_I + 1))))
     while [ "$CUR" == "$NEXT" ];do
         enabled=true
         ((F_TAG_I+=1))
-        CUR=$(echo $COLLECT_TAGS |cut -d \  -sf $F_TAG_I)
+        CUR=$NEXT
         NEXT=$(echo $COLLECT_TAGS |cut -d \  -sf $((($F_TAG_I + 1))))
     done
 
@@ -77,6 +70,14 @@ while [ "$F_TAG_I" -le "$COLLECT_AMT" ]; do
     fi
     ((F_TAG_I+=1))
 done
+
+
+#
+# tempfile magic
+#
+DIALOG=${DIALOG=dialog}
+tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+trap "rm -f $tempfile" 0 1 2 5 15
 
 
 #
