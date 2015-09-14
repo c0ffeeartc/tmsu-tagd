@@ -6,8 +6,9 @@ die () {
 
 #
 # require argument
+#   tmsu-tagd ./file [new_tag1, new_tag2=value, ...]
 #
-[ "$#" -eq 1 ] || die "1 filename argument required, $# provided"
+[ "$#" -gt 0 ] || die "At least 1 filename argument required, $# provided"
 
 
 #
@@ -30,51 +31,52 @@ trap "rm -f $tempfile" 0 1 2 5 15
 #
 FILE_TAGS=$(tmsu tags $FILE|cut -d \  -sf 2-)
 ALL_TAGS=$(tmsu tags)
-ALL_VALUES=$(tmsu values)
+ADD_TAGS=$(echo "$@"|cut -d \  -sf 2-)
+
+
+#
+# Collect all tags together
+#   FILE_TAGS and ADD_TAGS are used twice to enable them later
+#
+COLLECT_TAGS="$(echo $ALL_TAGS $FILE_TAGS $FILE_TAGS $ADD_TAGS $ADD_TAGS|tr ' ' '\n'|sort)"
+COLLECT_TAGS="dummy $COLLECT_TAGS"  # dummy helps 'cut -d -sf' command
+
+
+#
+# handle no tags at all
+#
+COLLECT_AMT=$(echo $COLLECT_TAGS|wc -w)
+if [ "$COLLECT_AMT" -le 1 ];then
+    echo "No tags found. Add some tags first."
+    echo "$ tmsu-tagd ./file new_tag"
+    exit 1
+fi
 
 
 #
 # prepare checklist
-#   WARNING: relies on that FILE_TAGS and ALL_TAGS are in same order
 #
 CHECKS=""
-F_TAG_I=1
-for TAG in $ALL_TAGS; do
-
+F_TAG_I=2
+while [ "$F_TAG_I" -le "$COLLECT_AMT" ]; do
     enabled=false
-    resolving_tag_values=true
-    while $resolving_tag_values; do
-        F_TAG=$(echo $FILE_TAGS|cut -d \  -f $F_TAG_I)
-
-        MORE_THAN_1_TAG=$(echo $FILE_TAGS|cut -d \  -sf 1)
-        if [ ! "$MORE_THAN_1_TAG" ] && [ "$F_TAG_I" -gt 1 ];then
-            break
-        fi
-
-        TAG_NAME=$(echo $F_TAG|cut -d "=" -f 1)
-        TAG_VAL=$(echo $F_TAG|cut -d "=" -sf 2)
-        if [ "${TAG_NAME}" == "${TAG}" ];then
-            if [ "$TAG_VAL" ]; then
-                CHECKS+="$F_TAG \"\" on "
-            else
-                enabled=true
-                resolving_tag_values=false
-            fi
-            ((F_TAG_I+=1))
-        else
-            resolving_tag_values=false
-        fi
-
+    CUR=$(echo $COLLECT_TAGS |cut -d \  -sf $F_TAG_I)
+    NEXT=$(echo $COLLECT_TAGS |cut -d \  -sf $((($F_TAG_I + 1))))
+    while [ "$CUR" == "$NEXT" ];do
+        enabled=true
+        ((F_TAG_I+=1))
+        CUR=$(echo $COLLECT_TAGS |cut -d \  -sf $F_TAG_I)
+        NEXT=$(echo $COLLECT_TAGS |cut -d \  -sf $((($F_TAG_I + 1))))
     done
 
-    CHECKS+="$TAG "
+    CHECKS+="$CUR "
     if $enabled ; then
         CHECKS+='"" on '
     else
         CHECKS+='"" off '
     fi
+    ((F_TAG_I+=1))
 done
-echo $CHECKS
 
 
 #
