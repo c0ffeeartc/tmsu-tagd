@@ -95,6 +95,7 @@ retval=$?
 choice=`cat $tempfile`
 case $retval in
   0)
+    clear
     UNTAG_ALL="tmsu untag --all $FILE"
     RETAG="tmsu tag --tags \"${choice}\" $FILE||tmsu tag --tags \"$FILE_TAGS\" $FILE"
     echo "$UNTAG_ALL ; $RETAG"
@@ -103,7 +104,9 @@ case $retval in
     if [ "$choice" ]; then eval $RETAG; fi
     ;;
   1)
+    clear
     echo "Cancel pressed.";;
   255)
+    clear
     echo "ESC pressed.";;
 esac
