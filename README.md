@@ -20,4 +20,5 @@ You may want to create easier symbolic link `ln -s ./tmsu-tagd tagd`
   - ncurses
 
 #### Known Issues
-  - currently only arguments within `[A-Za-z_0-9]` character set are handled correctly, for best experience do not use special characters or whitespace
+  - only arguments within `[A-Za-z_0-9]` character set are handled correctly, for best experience do not use special characters or whitespace
+  - currently no way to use database other than `~/.tmsu/default.db`
