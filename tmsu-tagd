@@ -98,13 +98,60 @@ retval=$?
 choice=`cat $tempfile`
 case $retval in
   0)
-    clear
-    UNTAG_ALL="tmsu untag --all $FILE"
-    RETAG="tmsu tag --tags \"${choice}\" $FILE||tmsu tag --tags \"$FILE_TAGS\" $FILE"
-    echo "$UNTAG_ALL ; $RETAG"
+    #
+    # new tagged and new untagged list
+    #   TODO: optimize, all are sorted
+    #
+    NEW_TAGGED=""
+    NEW_UNTAGGED=""
+    ALL_F_ADD_TAGS="$(echo $ALL_TAGS $FILE_TAGS $ADD_TAGS|tr ' ' '\n'|sort -u)"
+    for TAG in $ALL_F_ADD_TAGS; do
 
-    if [ "$FILE_TAGS" ]; then eval $UNTAG_ALL; fi
-    if [ "$choice" ]; then eval $RETAG; fi
+        IS_IN_FILE_TAGS=false
+        for F_TAG in $FILE_TAGS; do
+            if [ $F_TAG == $TAG ]; then
+                IS_IN_FILE_TAGS=true
+                break
+            fi
+        done
+
+        IS_IN_CHOICE=false
+        for C_TAG in $choice; do
+            if [ $C_TAG == $TAG ]; then
+                IS_IN_CHOICE=true
+                break
+            fi
+        done
+
+        if  ($IS_IN_CHOICE) &&  (! $IS_IN_FILE_TAGS) ; then
+            NEW_TAGGED+="$TAG "
+        else
+            if  (! $IS_IN_CHOICE)  &&  ($IS_IN_FILE_TAGS) ; then
+                NEW_UNTAGGED+="$TAG "
+            fi
+        fi
+    done
+
+    clear
+    TAG="tmsu tag --tags \"$NEW_TAGGED\" $FILE"
+    UNTAG="tmsu untag --tags \"$NEW_UNTAGGED\" $FILE"
+
+    if [ "$NEW_TAGGED" ] && [ "$NEW_UNTAGGED" ];then
+        echo "$TAG && $UNTAG"
+        eval "$TAG && $UNTAG"
+    else
+
+        if [ "$NEW_TAGGED" ]; then
+            echo "$TAG"
+            eval "$TAG"
+        fi
+
+        if [ "$NEW_UNTAGGED" ]; then
+            echo "$UNTAG"
+            eval "$UNTAG"
+        fi
+
+    fi
     ;;
   1)
     clear
