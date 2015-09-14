@@ -17,3 +17,5 @@ You may want to create easier symbolic link `ln -s ./tmsu-tagd tagd`
   - dialog
   - ncurses
 
+#### Known Issues
+  - currently only arguments with `[A-Za-z_0-9]` character set are handled correctly, do not use special characters or whitespace for best practice
