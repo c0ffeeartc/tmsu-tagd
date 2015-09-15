@@ -15,7 +15,7 @@ $ tmsu-tagd ./file new_tag newtag2=value
 
 You may want an easier to type shell command `ln -s ./tmsu-tagd tagd`
 
-Dialog checklist provides following hotkeys:
+Dialog checklist UI provides following hotkeys:
 
   - `<Up>`, `<Down>` - select next/previous tag
   - `<Left>`, `<Right>` - select button to press on `<Enter>`
