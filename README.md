@@ -2,17 +2,27 @@
 ncurses ui dialog script for editing [TMSU](https://github.com/oniony/TMSU) tags of one file
 
 #### Usage
-`$ tmsu-tagd ./file` will open ncurses ui checklist with available tags.
 
-To add new tags and values use:
+To edit file's tags:
+```
+$ tmsu-tagd ./file
+```
+
+To edit tags and add new tags and values:
 ```
 $ tmsu-tagd ./file new_tag newtag2=value
 ```
 
-Hit `<Escape>` or press `Cancel` to abort changes. Press `OK` to apply chosen tags.
-Hit letter keys to place cursor at tag with matching first letter.
+You may want an easier to type shell command `ln -s ./tmsu-tagd tagd`
 
-You may want to create easier symbolic link `ln -s ./tmsu-tagd tagd`
+Dialog checklist provides following hotkeys:
+
+  - `<Up>`, `<Down>` - select next/previous tag
+  - `<Left>`, `<Right>` - select button to press on `<Enter>`
+  - Letter keys - position cursor onto next tag with matching first key
+  - `<Space>` - toggle current checklist element
+  - `OK` button - apply changes and exit
+  - `Cancel` button, `<Esc>` - cancel changes and exit
 
 #### Dependencies
   - [TMSU](https://github.com/oniony/TMSU)
